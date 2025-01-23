@@ -54,6 +54,7 @@
 #define CONFIG_BOOTLOADER_CONTROL_BLOCK
 
 #define CONFIG_CMD_BOOTCTOL_AVB
+#define CONFIG_AVB2_KPUB_VENDOR 1
 
 /* support ext4*/
 #define CONFIG_CMD_EXT4 1
@@ -119,7 +120,7 @@
         "wipe_cache=successful\0"\
         "EnableSelinux=enforcing\0" \
         "recovery_part=recovery\0"\
-        "lock=10101000\0"\
+        "lock=10100000\0"\
         "recovery_offset=0\0"\
         "cvbs_drv=0\0"\
         "osd_reverse=0\0"\
@@ -131,7 +132,7 @@
         "fs_type=""rootfstype=ramfs""\0"\
         "aml_dt=sm1_s905y3_h96_max_x3\0"\
         "initargs="\
-            "init=/init console=ttyS0,115200 no_console_suspend earlyprintk=aml-uart,0xff803000 ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 "\
+            "init=/init console=null earlyprintk=aml-uart,0xff803000 ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 "\
             "\0"\
         "upgrade_check="\
             "echo upgrade_step=${upgrade_step}; "\
@@ -143,6 +144,7 @@
 		"get_bootloaderversion;" \
 		"setenv bootargs ${initargs}  hdr_priority=${hdr_priority} otg_device=${otg_device} reboot_mode_android=${reboot_mode_android} logo=${display_layer},loaded,${fb_addr} fb_width=${fb_width} fb_height=${fb_height} display_bpp=${display_bpp} outputmode=${outputmode} vout=${outputmode},enable panel_type=${panel_type} lcd_ctrl=${lcd_ctrl} hdmitx=${cecconfig},${colorattribute} hdmimode=${hdmimode} hdmichecksum=${hdmichecksum} dolby_vision_on=${dolby_vision_on} frac_rate_policy=${frac_rate_policy} hdmi_read_edid=${hdmi_read_edid} cvbsmode=${cvbsmode} osd_reverse=${osd_reverse} video_reverse=${video_reverse} irq_check_en=${Irq_check_en}  androidboot.selinux=${EnableSelinux} androidboot.firstboot=${firstboot} jtag=${jtag}; "\
 	"setenv bootargs ${bootargs} androidboot.hardware=amlogic androidboot.bootloader=${bootloader_version} androidboot.build.expect.baseband=N/A;"\
+	"setenv bootargs ${bootargs} mac=${ethaddr} androidboot.mac=${ethaddr};"\
             "run cmdline_keys;"\
             "\0"\
         "switch_bootmode="\
@@ -167,7 +169,7 @@
             "else if test ${reboot_mode} = cold_boot; then "\
                     "setenv reboot_mode_android ""normal"";"\
                     "run storeargs;"\
-            "else if test ${reboot_mode} = fastboot; then "\
+            "else if test ${reboot_mode} = fastboot -o ${reboot_mode} = bootloader; then "\
                 "setenv reboot_mode_android ""normal"";"\
                 "run storeargs;"\
                 "fastboot;"\
@@ -293,7 +295,7 @@
                     "setenv bootargs ${bootargs} androidboot.serialno=${usid};"\
                     "setenv serial ${usid};"\
                 "else "\
-                    "setenv bootargs ${bootargs} androidboot.serialno=1234567890;"\
+                    "setenv bootargs ${bootargs} androidboot.serialno=1234567894;"\
                     "setenv serial 1234567890;"\
                 "fi;"\
                 "if keyman read mac ${loadaddr} str; then "\
@@ -305,7 +307,7 @@
                 "if keyman read oemkey ${loadaddr} str; then "\
                     "setenv bootargs ${bootargs} androidboot.oem.key1=${oemkey};"\
                 "else "\
-                    "setenv bootargs ${bootargs} androidboot.oem.key1=ATV00104319;"\
+                    "setenv bootargs ${bootargs} androidboot.oem.key1=ATV00100020;"\
                 "fi;"\
             "fi;"\
             "\0"\
@@ -316,6 +318,11 @@
         "upgrade_key="\
             "if gpio input GPIOAO_3; then "\
                 "echo detect upgrade key; run update;"\
+            "fi;"\
+            "\0"\
+        "recovery_key="\
+            "if gpio input GPIOAO_3; then "\
+                "echo detect recovery key; run recovery_from_flash;"\
             "fi;"\
             "\0"\
 	"irremote_update="\
@@ -335,7 +342,7 @@
             "run upgrade_check;"\
             "run init_display;"\
             "run storeargs;"\
-            "run upgrade_key;" \
+            "run recovery_key;" \
             "bcb uboot-command;"\
             "run switch_bootmode;"
 
@@ -584,6 +591,7 @@
 	#define CONFIG_GATEWAYIP       10.18.9.1           /* Our getway ip address */
 	#define CONFIG_SERVERIP        10.18.9.113         /* Tftp server ip address */
 	#define CONFIG_NETMASK         255.255.255.0
+    #define CONFIG_ODROID_EFUSE_MAC 1
 #endif /* (CONFIG_CMD_NET) */
 
 /* other devices */
@@ -665,10 +673,13 @@
 //unify build for generate encrypted bootloader "u-boot.bin.encrypt"
 #define CONFIG_AML_CRYPTO_UBOOT   1
 
+#define CONFIG_AML_SIGNED_UBOOT   0
+
 //unify build for generate encrypted kernel image
 //SRC : "board/amlogic/(board)/boot.img"
 //DST : "fip/boot.img.encrypt"
 //#define CONFIG_AML_CRYPTO_IMG       1
+#define CONFIG_SKIP_KERNEL_DTB_SECBOOT_CHECK
 
 #endif //CONFIG_AML_SECURE_UBOOT
 
