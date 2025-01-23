@@ -1,6 +1,6 @@
 
 /*
- * board/amlogic/configs/sm1_ac214_v1.h
+ * board/amlogic/configs/sm1_h96_max_x3.h
  *
  * Copyright (C) 2015 Amlogic, Inc. All rights reserved.
  *
@@ -19,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef __SM1_AC214_V1_H__
-#define __SM1_AC214_V1_H__
+#ifndef __SM1_H96_MAX_X3_H__
+#define __SM1_H96_MAX_X3_H__
 
 #include <asm/arch/cpu.h>
 
@@ -129,6 +129,7 @@
         "reboot_mode_android=""normal""\0"\
         "Irq_check_en=0\0"\
         "fs_type=""rootfstype=ramfs""\0"\
+        "aml_dt=sm1_s905y3_h96_max_x3\0"\
         "initargs="\
             "init=/init console=ttyS0,115200 no_console_suspend earlyprintk=aml-uart,0xff803000 ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 "\
             "\0"\
@@ -283,7 +284,7 @@
             "else "\
                 "setenv reboot_mode_android ""normal"";"\
                 "run storeargs;"\
-                "hdmitx hpd;hdmitx get_preferred_mode;hdmitx get_parse_edid;dovi process;osd open;osd clear;imgread pic logo bootup $loadaddr;bmp display $bootup_offset;bmp scale;vout output ${outputmode};dovi set;dovi pkg;vpp hdrpkt;"\
+                "hdmitx hpd;hdmitx get_preferred_mode;hdmitx get_parse_edid;setenv dolby_status 0;setenv dolby_vision_on 0;osd open;osd clear;imgread pic logo bootup $loadaddr;bmp display $bootup_offset;bmp scale;vout output ${outputmode};vpp hdrpkt;"\
             "fi;fi;"\
             "\0"\
         "cmdline_keys="\
@@ -501,10 +502,6 @@
 /* DISPLAY & HDMITX */
 #define CONFIG_AML_HDMITX20 1
 
-#if defined(CONFIG_AML_HDMITX20)
-#define CONFIG_AML_DOLBY 1
-#endif
-
 #define CONFIG_AML_CANVAS 1
 #define CONFIG_AML_VOUT 1
 #define CONFIG_AML_OSD 1
@@ -560,7 +557,7 @@
 #define CONFIG_USBDOWNLOAD_GADGET 1
 #define CONFIG_SYS_CACHELINE_SIZE 64
 #define CONFIG_FASTBOOT_MAX_DOWN_SIZE	0x8000000
-#define CONFIG_DEVICE_PRODUCT	"newton"
+#define CONFIG_DEVICE_PRODUCT	"h96_max_x3"
 
 //UBOOT Facotry usb/sdcard burning config
 #define CONFIG_AML_V2_FACTORY_BURN              1       //support facotry usb burning
@@ -690,7 +687,7 @@
 
 /* Choose One of Ethernet Type */
 #undef CONFIG_ETHERNET_NONE
-#define ETHERNET_INTERNAL_PHY
+#undef ETHERNET_INTERNAL_PHY
 #undef ETHERNET_EXTERNAL_PHY
 
 #define CONFIG_HIGH_TEMP_COOL 90
