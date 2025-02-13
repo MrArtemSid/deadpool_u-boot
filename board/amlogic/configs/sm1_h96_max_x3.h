@@ -320,11 +320,6 @@
                 "echo detect upgrade key; run update;"\
             "fi;"\
             "\0"\
-        "recovery_key="\
-            "if gpio input GPIOAO_3; then "\
-                "echo detect recovery key; run recovery_from_flash;"\
-            "fi;"\
-            "\0"\
 	"irremote_update="\
 		"if irkey 2500000 0xe31cfb04 0xb748fb04; then "\
 			"echo read irkey ok!; " \
@@ -342,7 +337,7 @@
             "run upgrade_check;"\
             "run init_display;"\
             "run storeargs;"\
-            "run recovery_key;" \
+            "run upgrade_key;" \
             "bcb uboot-command;"\
             "run switch_bootmode;"
 
